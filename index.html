@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css.map" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/media.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div
+      class="container mt-5 rounded-1 bg-body-secondary d-flex flex-column p-2"
+    >
+      <header>
+        <h3 class="p-3">Summary Cards</h3>
+        <div class="cards d-flex justify-content-between mt-5">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6 class="card-title">Total Income</h6>
+              <div
+                class="d-flex w-100 justify-content-between align-content-center"
+              >
+                <p class="card-text" id="Tin">$0</p>
+                <i
+                  class="fa-solid fa-angles-up bg-success bg-gradient bg-opacity-75 p-1 rounded-1 fs-2"
+                ></i>
+              </div>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6 class="card-title">Total expenses</h6>
+              <div
+                class="d-flex w-100 justify-content-between align-content-center"
+              >
+                <p class="card-text" id="Tou">$0</p>
+                <i
+                  class="fa-solid fa-arrow-trend-down p-1 rounded-1 p-1 bg-danger fs-2"
+                ></i>
+              </div>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6 class="card-title">Current Balance</h6>
+              <div
+                class="d-flex w-100 justify-content-between align-content-center"
+              >
+                <p class="card-text" id="T">$0</p>
+                <i
+                  class="fa-solid fa-wallet bg-success-subtle p-1 rounded-1 fs-2"
+                ></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div id="getInfo" class="mt-4">
+        <h3>Enter your money</h3>
+        <div class="input-group input-group-sm mb-3 d-flex flex-column">
+          <label for="">Amount</label>
+          <input
+            type="number"
+            class="form-control w-25"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm"
+            id="Amount"
+          />
+        </div>
+        <div class="input-group input-group-sm mb-3 d-flex flex-column">
+          <label for=""> expenses</label>
+          <input
+            type="number"
+            class="form-control w-25"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm"
+            id="Expense"
+          />
+        </div>
+        <div class="category w-50">
+          <label for="PCategory" class="form-label">Category</label>
+          <select
+            class="form-select"
+            aria-label="Default select example"
+            id="Category"
+          >
+            <option value="none">--select--</option>
+            <option value="Food">Food & Drinking</option>
+            <option value="Sh">Shopping</option>
+            <option value="Bills">Bills & Utilities</option>
+            <option value="Enter">Entertainment</option>
+            <option value="Trans">Transportation</option>
+          </select>
+        </div>
+        <div class="s-day w-50 mt-2">
+          <label for="Days" class="form-label">Day</label>
+          <select
+            class="form-select mt-1"
+            aria-label="Default select example"
+            id="Days"
+          >
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+          </select>
+        </div>
+        <div class="add w-100 d-flex justify-content-end">
+          <div class="btn bg-success" id="add">ADD</div>
+        </div>
+        <div class="add w-100 d-flex justify-content-end mt-2">
+          <div class="btn bg-danger" id="Reset">Reset</div>
+        </div>
+      </div>
+      <div class="show">
+        <h5>Income vs Expense</h5>
+        <div class="track d-flex p-2">
+         
+          <div class="rows d-flex justify-content-between">
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in " id="in1"></div>
+              <div class="out " id="out1"></div>
+              <div class="day">sat</div>
+            </div>
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in" id="in2"></div>
+              <div class="out" id="out2"></div>
+              <div class="day">sun</div>
+            </div>
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in" id="in3"></div>
+              <div class="out" id="out3"></div>
+              <div class="day">Mon</div>
+            </div>
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in" id="in4"></div>
+              <div class="out" id="out4"></div>
+              <div class="day">Tues</div>
+            </div>
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in" id="in5"></div>
+              <div class="out" id="out5"></div>
+              <div class="day">Wed</div>
+            </div>
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in" id="in6"></div>
+              <div class="out" id="out6"></div>
+              <div class="day">Thurs</div>
+            </div>
+            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+              <div class="in" id="in7"></div>
+              <div class="out" id="out7"></div>
+              <div class="day">Fri</div>
+            </div>
+          </div>
+        </div>
+<div class="track-category mt-5 p-1">
+    <div class="Food">
+        <p>Food&Drinkes</p>
+        <div class="d-flex align-items-center">
+            <div class="trackS1" id="Food"></div>
+        <div class="PT ms-2" id="PF"></div>
+        </div>
+    </div>
+    <div class="shopping mt-1">
+        <p>Shopping</p>
+        <div class="d-flex align-items-center">
+            <div class="trackS2" id="Shopping"></div>
+        <div class="PT ms-2" id="PS"></div>
+        </div>
+    </div>
+    <div class="Bills mt-1">
+        <p>Bills</p>
+        <div class="d-flex align-items-center">
+            <div class="trackS3" id="Bills"></div>
+        <div class="PT ms-2" id="PB"></div>
+        </div>
+    </div>
+    <div class="Enter mt-1">
+        <p>Entertainment</p>
+        <div class="d-flex align-items-center">
+            <div class="trackS4" id="Enter"></div>
+        <div class="PT ms-2" id="PE"></div>
+        </div>
+    </div>
+    <div class="Trans mt-1">
+        <p>Transportation</p>
+        <div class="d-flex align-items-center">
+            <div class="trackS5" id="Trans"></div>
+        <div class="PT ms-2" id="PT"></div>
+        </div>
+    </div>
+</div>
+
+
+
+      </div>
+
+    </div>
+
+    <script src="js/all.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
