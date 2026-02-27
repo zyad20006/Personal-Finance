@@ -16,7 +16,7 @@
     >
       <header>
         <h3 class="p-3">Summary Cards</h3>
-        <div class="cards d-flex justify-content-between mt-5">
+        <div class="cards d-flex justify-content-between mt-5 flex-column">
           <div class="card mb-3">
             <div class="card-body">
               <h6 class="card-title">Total Income</h6>
@@ -43,6 +43,9 @@
               </div>
             </div>
           </div>
+          <div>
+            <div class="wallets" id="wallets"></div>
+          </div>
           <div class="card mb-3">
             <div class="card-body">
               <h6 class="card-title">Current Balance</h6>
@@ -56,12 +59,26 @@
               </div>
             </div>
           </div>
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6 class="card-title">Cash</h6>
+              <div
+                class="d-flex w-100 justify-content-between align-content-center"
+              >
+                <p class="card-text" id="cash">$0</p>
+                <i
+                  class="fa-solid fa-wallet bg-success-subtle p-1 rounded-1 fs-2"
+                ></i>
+              </div>
+            </div>
+          </div>
+          <div id="show-wallets"></div>
         </div>
       </header>
       <div id="getInfo" class="mt-4">
         <h3>Enter your money</h3>
         <div class="input-group input-group-sm mb-3 d-flex flex-column">
-          <label for="">Amount</label>
+          <label for="">Income</label>
           <input
             type="number"
             class="form-control w-25"
@@ -80,7 +97,18 @@
             id="Expense"
           />
         </div>
-        <div class="category w-50">
+        <div class="wallet w-50">
+          <label for="PCategory" class="form-label">Wallet</label>
+          <select
+            class="form-select"
+            aria-label="Default select example"
+            id="CWallet"
+          >
+            <option value="cash">Cash</option>
+            <div id="SWallets"></div>
+          </select>
+        </div>
+        <div class="category w-50 mt-2">
           <label for="PCategory" class="form-label">Category</label>
           <select
             class="form-select"
@@ -111,7 +139,22 @@
             <option value="Friday">Friday</option>
           </select>
         </div>
+        <div class="form-floating mt-4 w-50">
+          <textarea
+            class="form-control"
+            placeholder="Leave a comment here"
+            id="desc"
+            style="height: 100px"
+          ></textarea>
+          <label for="floatingTextarea2">Description</label>
+        </div>
         <div class="add w-100 d-flex justify-content-end">
+          <div class="btn bg-success text-white" id="add-wallet">
+            Add wallet <i class="fa-solid fa-circle-plus"></i>
+          </div>
+        </div>
+        <div id="getWallet"></div>
+        <div class="add w-100 d-flex justify-content-end mt-4">
           <div class="btn bg-success" id="add">ADD</div>
         </div>
         <div class="add w-100 d-flex justify-content-end mt-2">
@@ -121,89 +164,113 @@
       <div class="show">
         <h5>Income vs Expense</h5>
         <div class="track d-flex p-2">
-         
           <div class="rows d-flex justify-content-between">
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
-              <div class="in " id="in1"></div>
-              <div class="out " id="out1"></div>
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
+              <div class="in" id="in1"></div>
+              <div class="out" id="out1"></div>
               <div class="day">sat</div>
             </div>
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
               <div class="in" id="in2"></div>
               <div class="out" id="out2"></div>
               <div class="day">sun</div>
             </div>
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
               <div class="in" id="in3"></div>
               <div class="out" id="out3"></div>
               <div class="day">Mon</div>
             </div>
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
               <div class="in" id="in4"></div>
               <div class="out" id="out4"></div>
               <div class="day">Tues</div>
             </div>
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
               <div class="in" id="in5"></div>
               <div class="out" id="out5"></div>
               <div class="day">Wed</div>
             </div>
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
               <div class="in" id="in6"></div>
               <div class="out" id="out6"></div>
               <div class="day">Thurs</div>
             </div>
-            <div class="row position-relative d-flex justify-content-center flex-nowrap">
+            <div
+              class="row position-relative d-flex justify-content-center flex-nowrap"
+            >
               <div class="in" id="in7"></div>
               <div class="out" id="out7"></div>
               <div class="day">Fri</div>
             </div>
           </div>
         </div>
-<div class="track-category mt-5 p-1">
-    <div class="Food">
-        <p>Food&Drinkes</p>
-        <div class="d-flex align-items-center">
-            <div class="trackS1" id="Food"></div>
-        <div class="PT ms-2" id="PF"></div>
+        <div class="track-category mt-5 p-1">
+          <div class="Food">
+            <p>Food&Drinkes</p>
+            <div class="d-flex align-items-center">
+              <div class="trackS1" id="Food"></div>
+              <div class="PT ms-2" id="PF"></div>
+            </div>
+          </div>
+          <div class="shopping mt-1">
+            <p>Shopping</p>
+            <div class="d-flex align-items-center">
+              <div class="trackS2" id="Shopping"></div>
+              <div class="PT ms-2" id="PS"></div>
+            </div>
+          </div>
+          <div class="Bills mt-1">
+            <p>Bills</p>
+            <div class="d-flex align-items-center">
+              <div class="trackS3" id="Bills"></div>
+              <div class="PT ms-2" id="PB"></div>
+            </div>
+          </div>
+          <div class="Enter mt-1">
+            <p>Entertainment</p>
+            <div class="d-flex align-items-center">
+              <div class="trackS4" id="Enter"></div>
+              <div class="PT ms-2" id="PE"></div>
+            </div>
+          </div>
+          <div class="Trans mt-1">
+            <p>Transportation</p>
+            <div class="d-flex align-items-center">
+              <div class="trackS5" id="Trans"></div>
+              <div class="PT ms-2" id="PT"></div>
+            </div>
+          </div>
         </div>
-    </div>
-    <div class="shopping mt-1">
-        <p>Shopping</p>
-        <div class="d-flex align-items-center">
-            <div class="trackS2" id="Shopping"></div>
-        <div class="PT ms-2" id="PS"></div>
-        </div>
-    </div>
-    <div class="Bills mt-1">
-        <p>Bills</p>
-        <div class="d-flex align-items-center">
-            <div class="trackS3" id="Bills"></div>
-        <div class="PT ms-2" id="PB"></div>
-        </div>
-    </div>
-    <div class="Enter mt-1">
-        <p>Entertainment</p>
-        <div class="d-flex align-items-center">
-            <div class="trackS4" id="Enter"></div>
-        <div class="PT ms-2" id="PE"></div>
-        </div>
-    </div>
-    <div class="Trans mt-1">
-        <p>Transportation</p>
-        <div class="d-flex align-items-center">
-            <div class="trackS5" id="Trans"></div>
-        <div class="PT ms-2" id="PT"></div>
-        </div>
-    </div>
-</div>
-
-
-
       </div>
-
+      <h4>Recent Transactions</h4>
     </div>
-
+    <div class="container mt-3">
+      <table class="table table-hover table-borderless rounded-1">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Category</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Description</th>
+            <th scope="col">Wallet</th>
+            <th scope="col">Type</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
     <script src="js/all.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>

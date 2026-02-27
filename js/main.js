@@ -1,6 +1,7 @@
 var Amount = document.getElementById("Amount");
 var Expense = document.getElementById("Expense");
-Category = document.getElementById("Category");
+var Category = document.getElementById("Category");
+var desc = document.getElementById("desc");
 var add = document.getElementById("add");
 var days = document.getElementById("Days");
 var TIncome = document.getElementById("Tin");
@@ -21,6 +22,9 @@ var out5 = document.getElementById("out5");
 var out6 = document.getElementById("out6");
 var out7 = document.getElementById("out7");
 var Reset = document.getElementById("Reset");
+var addWallet = document.getElementById("add-wallet");
+var getWallet = document.getElementById("getWallet");
+var CWallet = document.getElementById("CWallet");
 var TShopping = document.getElementById("Shopping");
 var TFood = document.getElementById("Food");
 var TBills = document.getElementById("Bills");
@@ -31,26 +35,32 @@ var PF = document.getElementById("PF");
 var PB = document.getElementById("PB");
 var PT = document.getElementById("PT");
 var PE = document.getElementById("PE");
+var cash = document.getElementById("cash");
 var n = 0;
 var o = 0;
 var t = 0;
 tin = 0;
+var c = 0;
+var w = [];
+var NW = [];
+var today = new Date();
+var now;
+setday(today);
 var money = [];
 var indays = [];
 var outdays = [];
+var wallets = [];
 if (localStorage.getItem("money") != null) {
-
   money = JSON.parse(localStorage.getItem("money"));
 
   // إعادة تعيين القيم
   n = 0;
   o = 0;
-  indays = [0,0,0,0,0,0,0];
-  outdays = [0,0,0,0,0,0,0];
+  indays = [0, 0, 0, 0, 0, 0, 0];
+  outdays = [0, 0, 0, 0, 0, 0, 0];
 
   // إعادة الحساب من البيانات المخزنة
-  money.forEach(item => {
-
+  money.forEach((item) => {
     let incomeVal = Number(item.in) || 0;
     let outVal = Number(item.out) || 0;
 
@@ -61,7 +71,6 @@ if (localStorage.getItem("money") != null) {
 
     indays[dayIndex] += incomeVal;
     outdays[dayIndex] += outVal;
-
   });
 
   t = n - o;
@@ -73,23 +82,25 @@ if (localStorage.getItem("money") != null) {
 
   // إعادة رسم الأعمدة
   indays.forEach((value, i) => {
-    let totalIncome = indays.reduce((a,b)=>a+b,0);
+    let totalIncome = indays.reduce((a, b) => a + b, 0);
     let ratio = totalIncome ? (value / totalIncome) * 100 : 0;
 
-    [in1,in2,in3,in4,in5,in6,in7][i].style.height = `${ratio}%`;
+    [in1, in2, in3, in4, in5, in6, in7][i].style.height = `${ratio}%`;
   });
 
   outdays.forEach((value, i) => {
     let ratio = indays[i] ? (value / indays[i]) * 100 : 0;
-    if(ratio>100) ratio=100;
+    if (ratio > 100) ratio = 100;
 
-    [out1,out2,out3,out4,out5,out6,out7][i].style.height = `${ratio}%`;
+    [out1, out2, out3, out4, out5, out6, out7][i].style.height = `${ratio}%`;
   });
 
   display(money);
+  displayMoney();
 }
-
-
+if (localStorage.getItem("wallets") != null) {
+  wallets = JSON.parse(localStorage.getItem("wallets"));
+}
 function handleAdd() {
   if (Category.value === "none" && Expense.value !== "") {
     alert("please enter your Category");
@@ -99,22 +110,20 @@ function handleAdd() {
     alert("please enter money");
     return;
   }
- 
-
 
   n += Number(Amount.value);
   o += Number(Expense.value);
-  if(n<0||o<0){
-    alert("please enter valid number")
+  if (n < 0 || o < 0) {
+    alert("please enter valid number");
     return;
   }
-  if(o>n){
-     if ((o > t&&Expense.value !== "")) {
-    alert("you don't have money");
-    return;
+  if (o > n) {
+    if (o > t && Expense.value !== "") {
+      alert("you don't have money");
+      return;
+    }
   }
-  }
-   
+
   t = n - o;
 
   const wallet = {
@@ -122,25 +131,60 @@ function handleAdd() {
     out: Expense.value,
     cat: Category.value,
     day: days.value,
+    des: desc.value,
+    TWallet: CWallet.value,
   };
 
   TIncome.innerHTML = `$${n}`;
   TEpenses.innerHTML = `$${o}`;
   total.innerHTML = `$${t}`;
+  if (CWallet.value === "cash") {
+    c += Number(Amount.value);
+    c -= Number(Expense.value);
+    if (c < 0) {
+      alert("You don't have money in this wallet");
+      return;
+    }
+    cash.innerHTML = `$${c}`;
+  } else {
+    for (var i = 0; i < wallets.length; i++) {
+      if (CWallet.value === wallets[i]) {
+        w[i] = w[i] || 0;
+
+        w[i] += Number(Amount.value);
+        w[i] -= Number(Expense.value);
+        if (w[i] < 0) {
+          alert("You don't have money in this wallet");
+          return;
+        }
+
+        localStorage.setItem("walletBalances", JSON.stringify(w));
+
+        NW[i] = document.getElementById(wallets[i]);
+
+        NW[i].innerHTML = `${w[i]}`;
+      }
+    }
+  }
 
   money.push(wallet);
-localStorage.setItem("money", JSON.stringify(money));
+
+  localStorage.setItem("money", JSON.stringify(money));
   const h = check(days.value);
   income(h, Number(Amount.value));
   out(h, Number(Expense.value));
- display(money)
+  display(money);
+  displayMoney();
   Amount.value = "";
   Expense.value = "";
   Category.value = "none";
   days.value = "Saturday";
+  desc.value = "";
+  CWallet.value = "cash";
+  console.log(wallets);
 }
-function display(money){
- Wfood(money);
+function display(money) {
+  Wfood(money);
   WShopping(money);
   WBills(money);
   WEnter(money);
@@ -160,26 +204,27 @@ Reset.addEventListener("click", () => {
   [out1, out2, out3, out4, out5, out6, out7].forEach(
     (d) => (d.style.height = "0%"),
   );
-localStorage.removeItem("money");
-if(confirm("Are you sure you want to reset?")){
-  TIncome.innerHTML = `$0`;
-  TEpenses.innerHTML = `$0`;
-  total.innerHTML = `$0`;
-        TFood.style.width = ``;
-        TBills.style.width = ``;
-        TShopping.style.width = ``;
-        TEnter.style.width = ``;
-        TTrans.style.width = ``;
-        PF.innerHTML = ``
-        PS.innerHTML = ``
-        PB.innerHTML = ``
-        PT.innerHTML = ``
-        PE.innerHTML = ``
-
-}else{
-     handleAdd();
-}
- 
+  localStorage.removeItem("money");
+  localStorage.removeItem("wallets");
+  console.log(wallets);
+  if (confirm("Are you sure you want to reset?")) {
+    TIncome.innerHTML = `$0`;
+    TEpenses.innerHTML = `$0`;
+    total.innerHTML = `$0`;
+    TFood.style.width = ``;
+    TBills.style.width = ``;
+    TShopping.style.width = ``;
+    TEnter.style.width = ``;
+    TTrans.style.width = ``;
+    PF.innerHTML = ``;
+    PS.innerHTML = ``;
+    PB.innerHTML = ``;
+    PT.innerHTML = ``;
+    PE.innerHTML = ``;
+    location.reload();
+  } else {
+    handleAdd();
+  }
 });
 
 function income(index, n) {
@@ -199,8 +244,7 @@ function income(index, n) {
   indays.forEach((value, i) => {
     let ratio = total ? (value / total) * 100 : 0;
     dayDivs[i].style.height = `${ratio}%`;
-        dayDivs[i].setAttribute("data-height", `${ratio.toFixed(2)}%`);
-
+    dayDivs[i].setAttribute("data-height", `${ratio.toFixed(2)}%`);
   });
 }
 function out(index, n) {
@@ -228,8 +272,7 @@ function out(index, n) {
 
     // تحديث ارتفاع div المصروفات
     dayDivs[i].style.height = `${ratio}%`;
-            dayDivs[i].setAttribute("data-height", `${ratio.toFixed(2)}%`);
-
+    dayDivs[i].setAttribute("data-height", `${ratio.toFixed(2)}%`);
   });
 }
 function check(index) {
@@ -259,7 +302,7 @@ function check(index) {
 function Wfood(money) {
   let ws = 0;
 
-   for (var i = 0; i < money.length; i++) {
+  for (var i = 0; i < money.length; i++) {
     if (money[i].cat === "Food") {
       if (n === 0) {
         n = 1;
@@ -303,11 +346,11 @@ function WEnter(money) {
   ws = 0;
   for (var i = 0; i < money.length; i++) {
     if (money[i].cat === "Enter") {
-      if(n===0){
-        n=1
-    }
-ws+=Number(money[i].out)
-w=(ws/n)*100
+      if (n === 0) {
+        n = 1;
+      }
+      ws += Number(money[i].out);
+      w = (ws / n) * 100;
       TEnter.style.width = `${w}%`;
       PE.innerHTML = `${w.toFixed(2)}%`;
     }
@@ -317,13 +360,193 @@ function WTrans(money) {
   ws = 0;
   for (var i = 0; i < money.length; i++) {
     if (money[i].cat === "Trans") {
-     if(n===0){
-        n=1
-    }
-ws+=Number(money[i].out)
-w=(ws/n)*100
+      if (n === 0) {
+        n = 1;
+      }
+      ws += Number(money[i].out);
+      w = (ws / n) * 100;
       TTrans.style.width = `${w}%`;
       PT.innerHTML = `${w.toFixed(2)}%`;
     }
   }
+}
+
+function displayMoney() {
+  var p = "";
+  for (var i = 0; i < money.length; i++) {
+    var str = money[i].des || "None";
+    if (money[i].out !== "") {
+      p += `<tr> 
+
+  
+  <td>${money[i].day}</td>
+   <td>${money[i].cat}</td>
+   <td>${money[i].out}</td>
+         <td>${str.slice(0, 20)}</td> 
+       <td >${money[i].TWallet}</td> 
+
+    <td class="text-danger" >EXPENSE</td>
+     </tr> `;
+    }
+
+    if (money[i].in !== "") {
+      p += `<tr> 
+
+  
+  <td>${money[i].day}</td>
+   <td></td> 
+    <td>${money[i].in}</td>
+       <td >${str.slice(0, 20)}</td> 
+       <td >${money[i].TWallet}</td> 
+
+    <td class="text-success ">INCOME</td>
+     </tr> `;
+    }
+  }
+  document.getElementById("tableBody").innerHTML = p;
+}
+function setday(today) {
+  if (today.getDay() === 0) {
+    days.value = "Sunday";
+  }
+  if (today.getDay() === 1) {
+    days.value = "Monday";
+  }
+  if (today.getDay() === 2) {
+    days.value = "Tuesday";
+  }
+  if (today.getDay() === 3) {
+    days.value = "Wednesday";
+  }
+  if (today.getDay() === 4) {
+    days.value = "Thursday";
+  }
+  if (today.getDay() === 5) {
+    days.value = "Friday";
+  }
+  if (today.getDay() === 6) {
+    days.value = "Saturday";
+  }
+}
+
+addWallet.addEventListener("click", () => {
+  getWallet.innerHTML = `<div class="get-wallet z-3 p-5">
+            <div class="h-get-wallet d-flex justify-content-between">
+              <h3>Enter your wallet data</h3>
+              <div class="btn" id="c"><i class="fa-solid fa-circle-xmark"></i>
+</div>
+
+
+  
+</div>
+ <div class="input-group input-group-sm mb-3 d-flex flex-column">
+          <label for="wallet-Name"> Wallet Name</label>
+          <input
+            type="text"
+            class="form-control w-50 mt-1"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm"
+            id="wallet-Name"
+          />
+        </div>
+        <div class="add w-100 d-flex justify-content-end mt-4">
+          <div class="btn bg-btn" id="F-add-wallet">ADD</div>
+        </div>
+          </div>`;
+  var walletName = document.getElementById("wallet-Name");
+  var FAddWallet = document.getElementById("F-add-wallet");
+  var c = document.getElementById("c");
+  FAddWallet.addEventListener("click", () => {
+    console.log(wallets);
+
+    wallets.push(walletName.value);
+
+    w.push(0);
+    localStorage.setItem("wallets", JSON.stringify(wallets));
+    localStorage.setItem("walletBalances", JSON.stringify(w));
+
+    walletName.value = "";
+    getWallet.innerHTML = "";
+
+    var SWallets = document.getElementById("SWallets");
+    var p = "";
+    for (var i = 0; i < wallets.length; i++) {
+      p += `<option value="${wallets[i]}">${wallets[i]}</option>`;
+    }
+    SWallets.innerHTML = p;
+
+    var ShowWallets = document.getElementById("show-wallets");
+    var x = "";
+    for (var i = 0; i < wallets.length; i++) {
+      w[i] || 0;
+      x += `
+     <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-title">${wallets[i]}</h6>
+            <div class="d-flex w-100 justify-content-between align-content-center">
+              <p class="card-text" id="${wallets[i]}">$${w[i]}</p> 
+              
+<div class="d-flex w-25 align-items-center justify-content-end ">
+                                <i class="fa-solid fa-wallet bg-success-subtle p-1 rounded-1 fs-2"></i>
+
+                                <div class="btn btn-outline-danger ms-3" onclick="deleteWallet(${i})">remove</div>
+
+                </div>
+            </div>
+          </div>
+        </div>`;
+    }
+    ShowWallets.innerHTML = x;
+  });
+  c.addEventListener("click", () => {
+    getWallet.innerHTML = "";
+  });
+});
+document.addEventListener("DOMContentLoaded", () => {
+  loadWalletsFromStorage();
+});
+
+function loadWalletsFromStorage() {
+  if (
+    localStorage.getItem("wallets") !== null &&
+    localStorage.getItem("walletBalances") !== null
+  ) {
+    wallets = JSON.parse(localStorage.getItem("wallets"));
+    w = JSON.parse(localStorage.getItem("walletBalances"));
+
+    var SWallets = document.getElementById("SWallets");
+    var p = "";
+    for (var i = 0; i < wallets.length; i++) {
+      p += `<option value="${wallets[i]}">${wallets[i]}</option>`;
+    }
+    SWallets.innerHTML = p;
+
+    var ShowWallets = document.getElementById("show-wallets");
+    var x = "";
+    for (var i = 0; i < wallets.length; i++) {
+      x += `
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-title">${wallets[i]}</h6>
+            <div class="d-flex w-100 justify-content-between align-content-center">
+              <p class="card-text" id="${wallets[i]}">$${w[i]}</p> 
+              
+<div class="d-flex w-25 align-items-center justify-content-end ">
+                                <i class="fa-solid fa-wallet bg-success-subtle p-1 rounded-1 fs-2"></i>
+
+                                <div class="btn btn-outline-danger ms-3" onclick="deleteWallet(${i})">remove</div>
+
+                </div>
+            </div>
+          </div>
+        </div>`;
+    }
+    ShowWallets.innerHTML = x;
+  }
+}
+function deleteWallet(index) {
+  wallets.splice(index, 1);
+  localStorage.setItem("wallets", JSON.stringify(wallets));
+  console.log(wallets);
+  loadWalletsFromStorage();
 }
