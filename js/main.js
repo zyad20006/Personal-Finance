@@ -98,8 +98,16 @@ if (localStorage.getItem("money") != null) {
   display(money);
   displayMoney();
 }
-if (localStorage.getItem("wallets") != null) {
-  wallets = JSON.parse(localStorage.getItem("wallets"));
+wallets = JSON.parse(localStorage.getItem("wallets")) || [];
+w = JSON.parse(localStorage.getItem("walletBalances")) || [];
+// إذا طول w أقل من wallets زود 0 تلقائي
+while (w.length < wallets.length) {
+  w.push(0);
+}
+
+// إذا طول w أكبر من wallets نقص آخر عناصر
+while (w.length > wallets.length) {
+  w.pop();
 }
 function handleAdd() {
   if (Category.value === "none" && Expense.value !== "") {
@@ -138,38 +146,54 @@ function handleAdd() {
   TIncome.innerHTML = `$${n}`;
   TEpenses.innerHTML = `$${o}`;
   total.innerHTML = `$${t}`;
+
+
   if (CWallet.value === "cash") {
+     let c = Number(localStorage.getItem("cashBalance")) || 0
     c += Number(Amount.value);
     c -= Number(Expense.value);
     if (c < 0) {
       alert("You don't have money in this wallet");
       return;
     }
+    localStorage.setItem("cashBalance", c);
+
     cash.innerHTML = `$${c}`;
-  } else {
-    for (var i = 0; i < wallets.length; i++) {
-      if (CWallet.value === wallets[i]) {
-        w[i] = w[i] || 0;
 
-        w[i] += Number(Amount.value);
-        w[i] -= Number(Expense.value);
-        if (w[i] < 0) {
-          alert("You don't have money in this wallet");
-          return;
-        }
+  } 
+if (CWallet.value !== "cash") {
 
-        localStorage.setItem("walletBalances", JSON.stringify(w));
+  for (var i = 0; i < wallets.length; i++) {
 
-        NW[i] = document.getElementById(wallets[i]);
+    if (CWallet.value === wallets[i]) {
+      var currentBalance = Number(w[i]) || 0;  
+      var amountIn = Number(Amount.value) || 0;
+      var amountOut = Number(Expense.value) || 0;
 
-        NW[i].innerHTML = `${w[i]}`;
+      // تحقق أولًا قبل أي تحديث
+      if (amountOut > currentBalance + amountIn) {
+        alert("You don't have enough money in this wallet");
+location.reload()
+        return; // سيوقف العملية قبل أي خصم
       }
+
+      // العملية صالحة فقط هنا
+      var newBalance = currentBalance + amountIn - amountOut;
+      w[i] = newBalance;
+
+      // حفظ الرصيد الجديد بعد التأكد
+      localStorage.setItem("walletBalances", JSON.stringify(w));
+
+      // تحديث العرض بعد التأكد
+      NW[i] = document.getElementById(wallets[i]);
+      if (NW[i]) NW[i].innerHTML = `$${w[i]}`;
     }
   }
+}
 
   money.push(wallet);
+    localStorage.setItem("money", JSON.stringify(money));
 
-  localStorage.setItem("money", JSON.stringify(money));
   const h = check(days.value);
   income(h, Number(Amount.value));
   out(h, Number(Expense.value));
@@ -182,7 +206,16 @@ function handleAdd() {
   desc.value = "";
   CWallet.value = "cash";
   console.log(wallets);
+    location.reload();
+
 }
+window.onload = function () {
+  var savedCash = localStorage.getItem("cashBalance");
+ c = Number(savedCash) || 0;
+
+
+  document.getElementById("cash").innerHTML = `$${c}`;
+};
 function display(money) {
   Wfood(money);
   WShopping(money);
@@ -197,6 +230,8 @@ Reset.addEventListener("click", () => {
   n = 0;
   o = 0;
   t = 0;
+    document.getElementById("cash").innerHTML = `$0`;
+
   indays.splice(0, indays.length);
   outdays.splice(0, outdays.length);
 
@@ -206,6 +241,7 @@ Reset.addEventListener("click", () => {
   );
   localStorage.removeItem("money");
   localStorage.removeItem("wallets");
+  localStorage.removeItem("cashBalance");
   console.log(wallets);
   if (confirm("Are you sure you want to reset?")) {
     TIncome.innerHTML = `$0`;
@@ -282,7 +318,7 @@ function check(index) {
   if (index === "Sunday") {
     return 2;
   }
-  if (index === "Monday") {
+  if (index === "Monday")   {
     return 3;
   }
   if (index === "Tuesday") {
@@ -298,7 +334,6 @@ function check(index) {
     return 7;
   }
 }
-
 function Wfood(money) {
   let ws = 0;
 
@@ -459,11 +494,15 @@ addWallet.addEventListener("click", () => {
   FAddWallet.addEventListener("click", () => {
     console.log(wallets);
 
-    wallets.push(walletName.value);
+wallets.push(walletName.value);
+w.push(0); // <== لازم تديها صفر كبداية
 
-    w.push(0);
+localStorage.setItem("wallets", JSON.stringify(wallets));
+localStorage.setItem("walletBalances", JSON.stringify(w));
+   
     localStorage.setItem("wallets", JSON.stringify(wallets));
     localStorage.setItem("walletBalances", JSON.stringify(w));
+    
 
     walletName.value = "";
     getWallet.innerHTML = "";
@@ -545,8 +584,38 @@ function loadWalletsFromStorage() {
   }
 }
 function deleteWallet(index) {
+  // التأكد إن w مصفوفة
+  if (!Array.isArray(w)) w = [];
+
   wallets.splice(index, 1);
+  w.splice(index, 1); // ⚡ لازم يكون array
+
   localStorage.setItem("wallets", JSON.stringify(wallets));
-  console.log(wallets);
-  loadWalletsFromStorage();
+  localStorage.setItem("walletBalances", JSON.stringify(w));
+
+  renderWallets();       // دالة تعرض المحافظ
+  loadWalletsFromStorage();// تحدث الـ select
+}
+function renderWallets() {
+  var container = document.getElementById("show-wallets");
+  if (!container) return;
+
+  var html = "";
+  for (let i = 0; i < wallets.length; i++) {
+    let name = wallets[i];
+    html += `
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="card-title">${name}</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <p class="card-text" id="${name}">$${w[i]}</p>
+            <button class="btn btn-outline-danger btn-sm" onclick="deleteWallet(${i})">
+              remove
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
 }
